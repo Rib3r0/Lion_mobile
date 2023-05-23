@@ -91,7 +91,6 @@ fun mainScreen() {
                     content = {
                     items(2) {
                         Card(
-                            //aaaaaaaaaaaaa
                             modifier = Modifier.size(150.dp)
                                 .clickable {  },
                             shape = RoundedCornerShape(20.dp),
@@ -113,17 +112,7 @@ fun mainScreen() {
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
                                 )
-                                Image(
-                                    modifier = Modifier.size(40.dp),
-                                    painter = painterResource(id = R.drawable.code),
-                                    contentDescription = ""
-                                )
-                                Text(
-                                    text = "DS",
-                                    fontSize = 30.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                )
+
                             }
                         }
 
