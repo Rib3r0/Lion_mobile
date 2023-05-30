@@ -2,4 +2,6 @@
     <string name="app_name">LionSchool</string>
     <string name="Logo">Lion School</string>
     <string name="cursos">Gerencie seus cursos</string>
+    <string name="title_activity_alunos">AlunosActivity</string>
+    <string name="title_activity_aluno">AlunoActivity</string>
 </resources>

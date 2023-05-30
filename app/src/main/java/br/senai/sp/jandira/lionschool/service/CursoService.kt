@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface CursoService {
 
-    @GET("/v1/lion-school/cursos")
+    @GET("lion-school/cursos")
     fun getCursos(): Call<ListCursos>
 }
