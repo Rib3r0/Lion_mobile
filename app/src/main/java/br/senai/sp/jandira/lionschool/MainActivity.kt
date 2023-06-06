@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import br.senai.sp.jandira.lionschool.model.ListCursos
 import br.senai.sp.jandira.lionschool.service.RetrofitFactory
 import br.senai.sp.jandira.lionschool.ui.theme.LionSchoolTheme
+import coil.compose.AsyncImage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,7 +71,7 @@ fun MainScreen() {
         }
 
     })
-
+    Log.i("ds2m"," $cursos")
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color(51,71,176)
@@ -118,12 +120,14 @@ fun MainScreen() {
                     horizontalArrangement = Arrangement.spacedBy(46.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     content = {
-                    items(2) {
+                    items(cursos) {
+
                         Card(
                             modifier = Modifier.size(150.dp)
                                 .clickable {
                                     val intent = Intent(context, AlunosActivity::class.java)
-                                    intent.putExtra("nome", "DS")
+                                    intent.putExtra("sigla", it.sigla)
+                                    intent.putExtra("titulo", it.nome)
                                     context.startActivity(intent)
                                 },
                             shape = RoundedCornerShape(20.dp),
@@ -134,13 +138,13 @@ fun MainScreen() {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Image(
+                                AsyncImage(
                                     modifier = Modifier.size(40.dp),
-                                    painter = painterResource(id = R.drawable.code),
-                                    contentDescription = ""
+                                    model = it.icone
+                                    , contentDescription = "AVATAR"
                                 )
                                 Text(
-                                    text = "DS",
+                                    text = it.sigla,
                                     fontSize = 30.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,

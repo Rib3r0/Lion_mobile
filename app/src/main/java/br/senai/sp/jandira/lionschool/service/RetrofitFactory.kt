@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitFactory {
-    private val URL_BASE = "https://localhost:8080/v1/"
+    private val URL_BASE = "https://api-lion-school-gustavo.cyclic.app/v1/lion-school/"
 
     private val retrofitFactory = Retrofit.Builder()
         .baseUrl(URL_BASE)

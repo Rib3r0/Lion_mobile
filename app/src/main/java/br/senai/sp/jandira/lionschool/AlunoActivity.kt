@@ -1,46 +1,67 @@
 package br.senai.sp.jandira.lionschool
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.senai.sp.jandira.lionschool.ui.theme.LionSchoolTheme
+import br.senai.sp.jandira.lionschool.model.ListDisciplinas
+import br.senai.sp.jandira.lionschool.service.RetrofitFactory
+import coil.compose.AsyncImage
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class AlunoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AlunoScreen()
+            AlunoScreen(intent.extras?.getString("nome"),intent.extras?.getString("foto"),intent.extras?.getString("matricula"))
         }
     }
 }
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun AlunoScreen() {
+fun AlunoScreen(nome :String?,foto :String?,matricula : String?) {
     val context = LocalContext.current
+
+    var materias by remember {
+        mutableStateOf(listOf<br.senai.sp.jandira.lionschool.model.Disciplinas>())
+    }
+    //Hamad para a API
+    val call = RetrofitFactory().getCursosService().getInfoAluno(matricula)
+
+    call.enqueue(object : Callback<ListDisciplinas> {
+        override fun onResponse(
+            call: Call<ListDisciplinas>,
+            response: Response<ListDisciplinas>
+
+        ) {
+            Log.i("ds2m","$response")
+            materias = response.body()!!.disciplinas
+
+        }
+
+        override fun onFailure(call: Call<ListDisciplinas>, t: Throwable) {
+            Log.i("ds2m","onFailure: $t")
+        }
+
+    })
+    Log.i("ds2m","$materias")
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -57,16 +78,16 @@ fun AlunoScreen() {
 
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "José Matheus da Silva Miranda",
+                    text = nome.toString(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Image(
+                AsyncImage(
                     modifier = Modifier.size(200.dp),
-                    painter = painterResource(id = R.drawable.aluno),
+                    model = foto,
                     contentDescription = "logo"
                 )
 
@@ -90,58 +111,161 @@ fun AlunoScreen() {
                 )
                 LazyColumn(
                     content = {
-                        items(2){
+                        items(materias) {
                             Column() {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        modifier = Modifier
-                                            .padding(20.dp,0.dp),
-                                        text = "PWFE",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = Color(51,71,176)
-                                    )
-                                    Text(
-                                        modifier = Modifier
-                                            .padding(20.dp,5.dp),
-                                        text = "90",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = Color(51,71,176)
-                                    )
-                                }
-                                Card(
-                                    shape = AbsoluteCutCornerShape(0.dp),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(20.dp)
-                                        .padding(20.dp, 0.dp)
-                                    ,
-                                    backgroundColor = Color(0,0,0,25),
-                                    elevation = 0.dp
-                                ) {
-                                    Card(
-                                        shape = AbsoluteCutCornerShape(0.dp),
-                                        modifier = Modifier
-                                            .width(5.dp)
-                                            .height(25.dp)
-                                            .padding(0.dp, 0.dp,20.dp,0.dp)
-                                        ,
-                                        backgroundColor = Color(51,71,176)
+                                if (it.media.toInt() >= 70) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
 
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 0.dp),
+                                            text = it.nome,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(51, 71, 176)
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 5.dp),
+                                            text = it.media,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(51, 71, 176)
+                                        )
                                     }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(20.dp)
+                                            .padding(20.dp, 0.dp)
+                                            .background(Color(0, 0, 0, 25))
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth((it.media.toFloat() * 0.01).toFloat())
+                                                .height(25.dp)
+                                                .background(Color(51, 71, 176))
+                                        ) {
+
+                                        }
+                                    }
+
+
+                                } else if (it.media.toInt() in 50..69) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 0.dp),
+                                            text = it.nome,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(229, 182, 87)
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 5.dp),
+                                            text = it.media,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(229, 182, 87)
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(20.dp)
+                                            .padding(20.dp, 0.dp)
+                                            .background(Color(0, 0, 0, 25))
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth((it.media.toFloat() * 0.01).toFloat())
+                                                .height(25.dp)
+                                                .background(Color(229, 182, 87))
+                                        ) {
+
+                                        }
+                                    }
+
+                                } else{
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 0.dp),
+                                            text = it.nome,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(193, 16, 16)
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(20.dp, 5.dp),
+                                            text = it.media,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = Color(193, 16, 16)
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(20.dp)
+                                            .padding(20.dp, 0.dp)
+                                            .background(Color(0, 0, 0, 25))
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth((it.media.toFloat() * 0.01).toFloat())
+                                                .height(25.dp)
+                                                .background(Color(193, 16, 16))
+                                        ) {
+
+                                        }
+                                    }
+
                                 }
+
+                                Spacer(modifier = Modifier.height(20.dp))
                             }
+
                         }
                     }
+
                 )
+
 
             }
         }
 
     }
+}
+fun criarSigla(string: String): String {
+    val palavras = string.split(" ")
+    val sigla = StringBuilder()
+
+    if(palavras.size > 1){
+        for (palavra in palavras) {
+            if (palavra.isNotEmpty() && palavra.length > 2) {
+                sigla.append(palavra[0].uppercase())
+            }else if(palavra.isNotEmpty() && palavra.length <= 2 && palavra.startsWith("I")) {
+                sigla.append(palavra.uppercase())
+            }
+        }
+    }else{
+        sigla.append(palavras[0])
+    }
+
+
+    return sigla.toString()
 }
