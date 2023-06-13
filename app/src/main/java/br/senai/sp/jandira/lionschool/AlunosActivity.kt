@@ -74,7 +74,6 @@ fun AlunosScreen(curso : String?,titulo : String?) {
         }
 
     })
-    Log.i("ds2m","$alunos")
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color(51,71,176)
@@ -112,37 +111,65 @@ fun AlunosScreen(curso : String?,titulo : String?) {
                         contentDescription = ""
                     )
                     Spacer(modifier = Modifier.width(9.dp))
+
                     var color by remember { mutableStateOf(Color.White) }
                     var colorText by remember { mutableStateOf(Color(51,71,176)) }
                     var isEnable by remember{ mutableStateOf( false)}
+
+                    var colorFinalizado by remember { mutableStateOf(Color.White) }
+                    var colorTextFinalizado by remember { mutableStateOf(Color(51,71,176)) }
+                    var isEnableFinalizado by remember{ mutableStateOf( false)}
+
                     Card(
                         onClick = {
                             if(!isEnable){
                                 color = Color(51,71,176)
                                 colorText = Color.White
                                 isEnable = true
+
+                                colorFinalizado = Color.White
+                                colorTextFinalizado = Color(51,71,176)
+                                isEnableFinalizado = false
+
+                                val call = RetrofitFactory().getCursosService().getAlunosByStatus(curso,"Cursando")
+
+                                call.enqueue(object : Callback<ListAlunos> {
+                                    override fun onResponse(
+                                        call: Call<ListAlunos>,
+                                        response: Response<ListAlunos>
+                                    ) {
+                                        alunos = response.body()!!.alunos
+                                    }
+
+                                    override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
+                                        Log.i("ds2m","onFailure: $t")
+                                    }
+
+                                })
                             }else{
                                 color = Color.White
                                 colorText = Color(51,71,176)
                                 isEnable = false
+
+                                val call = RetrofitFactory().getCursosService().getAlunos(curso)
+
+                                call.enqueue(object : Callback<ListAlunos> {
+                                    override fun onResponse(
+                                        call: Call<ListAlunos>,
+                                        response: Response<ListAlunos>
+                                    ) {
+                                        alunos = response.body()!!.alunos
+                                    }
+
+                                    override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
+                                        Log.i("ds2m","onFailure: $t")
+                                    }
+
+                                })
                             }
                             Log.i("ds2m","onFailure: ${isEnable}")
 
-                            val call = RetrofitFactory().getCursosService().getAlunosByStatus(curso,"Cursando")
 
-                            call.enqueue(object : Callback<ListAlunos> {
-                                override fun onResponse(
-                                    call: Call<ListAlunos>,
-                                    response: Response<ListAlunos>
-                                ) {
-                                    alunos = response.body()!!.alunos
-                                }
-
-                                override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
-                                    Log.i("ds2m","onFailure: $t")
-                                }
-
-                            })
                                   },
                         border = BorderStroke(2.dp, Color(51,71,176)),
                         backgroundColor = color,
@@ -156,35 +183,55 @@ fun AlunosScreen(curso : String?,titulo : String?) {
                         )
                     }
                     Spacer(modifier = Modifier.width(9.dp))
-                    var colorFinalizado by remember { mutableStateOf(Color.White) }
-                    var colorTextFinalizado by remember { mutableStateOf(Color(51,71,176)) }
-                    var isEnableFinalizado by remember{ mutableStateOf( false)}
+
                     Card(
                         onClick = {
                             if(!isEnableFinalizado){
                                 colorFinalizado = Color(51,71,176)
                                 colorTextFinalizado = Color.White
                                 isEnableFinalizado = true
+
+                                color = Color.White
+                                colorText = Color(51,71,176)
+                                isEnable = false
+
+                                val call = RetrofitFactory().getCursosService().getAlunosByStatus(curso,"Finalizado")
+                                call.enqueue(object : Callback<ListAlunos> {
+                                    override fun onResponse(
+                                        call: Call<ListAlunos>,
+                                        response: Response<ListAlunos>
+                                    ) {
+                                        alunos = response.body()!!.alunos
+                                    }
+
+                                    override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
+                                        Log.i("ds2m","onFailure: $t")
+                                    }
+
+                                })
                             }else{
                                 colorFinalizado = Color.White
                                 colorTextFinalizado = Color(51,71,176)
                                 isEnableFinalizado = false
+
+                                val call = RetrofitFactory().getCursosService().getAlunos(curso)
+
+                                call.enqueue(object : Callback<ListAlunos> {
+                                    override fun onResponse(
+                                        call: Call<ListAlunos>,
+                                        response: Response<ListAlunos>
+                                    ) {
+                                        alunos = response.body()!!.alunos
+                                    }
+
+                                    override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
+                                        Log.i("ds2m","onFailure: $t")
+                                    }
+
+                                })
                             }
 
-                            val call = RetrofitFactory().getCursosService().getAlunosByStatus(curso,"Finalizado")
-                            call.enqueue(object : Callback<ListAlunos> {
-                                override fun onResponse(
-                                    call: Call<ListAlunos>,
-                                    response: Response<ListAlunos>
-                                ) {
-                                    alunos = response.body()!!.alunos
-                                }
 
-                                override fun onFailure(call: Call<ListAlunos>, t: Throwable) {
-                                    Log.i("ds2m","onFailure: $t")
-                                }
-
-                            })
 
                         },
                         backgroundColor = colorFinalizado ,
